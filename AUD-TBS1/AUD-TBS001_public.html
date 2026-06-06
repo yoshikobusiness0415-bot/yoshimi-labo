@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AUD-TBS001 – Audit Risk Assessment | YoshimiLabo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #f5f1e8;
+    --surface: #ffffff;
+    --surface2: #faf8f3;
+    --border: #e0dbd0;
+    --text: #0f0e0b;
+    --muted: #6b6b6b;
+    --accent: #1a3a6b;
+    --gold: #b8860b;
+    --green: #1a6b3c;
+    --green-bg: #eaf5ee;
+    --red: #8b1a1a;
+    --red-bg: #fdeaea;
+    --correct-border: #2ea043;
+    --wrong-border: #da3633;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: #0f0e0b;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 2.5rem 1rem 5rem;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    max-width: 880px;
+    margin: 0 auto 2.8rem;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .badge {
+    font-family: 'DM Mono', monospace;
+    font-size: .6rem;
+    font-weight: 500;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    background: var(--accent);
+    color: #fff;
+    padding: .3rem .65rem;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.55rem;
+    line-height: 1.15;
+    flex: 1;
+    color: #0f0e0b;
+  }
+  .pts {
+    font-family: 'DM Mono', monospace;
+    font-size: .68rem;
+    color: var(--gold);
+    letter-spacing: .08em;
+    flex-shrink: 0;
+  }
+
+  /* ─── SCENARIO ─── */
+  .scenario-card {
+    max-width: 880px;
+    margin: 0 auto 2.6rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.8rem 2rem;
+  }
+  .scenario-label {
+    font-family: 'DM Mono', monospace;
+    font-size: .58rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: .7rem;
+  }
+  .scenario-card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    margin-bottom: .9rem;
+    color: #0f0e0b;
+  }
+  .scenario-card p {
+    font-size: .9rem;
+    line-height: 1.8;
+    color: #1a1a1a;
+  }
+  .scenario-card p + p { margin-top: .7rem; }
+
+  .data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .55rem 2.5rem;
+    margin-top: 1.3rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+    font-size: .86rem;
+  }
+  .data-row { display: flex; justify-content: space-between; align-items: baseline; }
+  .data-label { color: #444444; }
+  .data-value { font-family: 'DM Mono', monospace; font-weight: 500; font-size: .83rem; color: var(--accent); }
+
+  /* ─── TASKS ─── */
+  .tasks-wrapper {
+    max-width: 880px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+  }
+
+  .task {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .task-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: .9rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .task-num {
+    font-family: 'DM Mono', monospace;
+    font-size: .62rem;
+    font-weight: 500;
+    letter-spacing: .1em;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .task-q {
+    font-size: .9rem;
+    line-height: 1.55;
+    color: #1a1a1a;
+  }
+  .task-body { padding: 1.3rem 1.5rem; }
+
+  /* ─── DRAG-DROP ─── */
+  .dd-container {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 1.4rem;
+    align-items: start;
+  }
+  .source-pool h4, .drop-zone-wrap h4 {
+    font-family: 'DM Mono', monospace;
+    font-size: .58rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    margin-bottom: .65rem;
+    color: #444444;
+  }
+  .chip {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: .32rem .65rem;
+    font-size: .79rem;
+    cursor: grab;
+    margin: .22rem .18rem;
+    user-select: none;
+    color: #0f0e0b;
+    transition: background .15s, border-color .15s;
+  }
+  .chip:hover { background: #ebe7d8; border-color: var(--accent); }
+  .chip.dragging { opacity: .4; }
+  .chip.placed { background: #dce8f5; border-color: var(--accent); color: var(--accent); }
+
+  .drop-table { width: 100%; border-collapse: collapse; }
+  .drop-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: .6rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    background: var(--surface2);
+    color: #444444;
+    padding: .55rem .85rem;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+  .drop-table td {
+    border: 1px solid var(--border);
+    padding: .5rem .85rem;
+    font-size: .84rem;
+    vertical-align: middle;
+    color: #1a1a1a;
+  }
+  .drop-cell {
+    min-height: 2.2rem;
+    border: 1px dashed #444 !important;
+    background: var(--bg) !important;
+    transition: background .15s;
+  }
+  .drop-cell.over { background: #dce8f5 !important; border-color: var(--accent) !important; }
+  .drop-cell .chip { margin: 0; }
+
+  /* ─── OPTIONS ─── */
+  .options-list { list-style: none; display: flex; flex-direction: column; gap: .45rem; }
+  .opt-item {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    padding: .65rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+    font-size: .88rem;
+    color: #1a1a1a;
+    background: var(--bg);
+  }
+  .opt-item:hover { background: var(--surface2); border-color: #555; }
+  .opt-item input { accent-color: var(--accent); width: 1rem; height: 1rem; flex-shrink: 0; }
+  .opt-item.selected { background: #dce8f5; border-color: var(--accent); }
+
+  /* ─── FILL TABLE ─── */
+  .fill-table { width: 100%; border-collapse: collapse; }
+  .fill-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: .6rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    background: var(--surface2);
+    color: #444444;
+    padding: .55rem .85rem;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+  .fill-table td {
+    border: 1px solid var(--border);
+    padding: .5rem .85rem;
+    font-size: .84rem;
+    vertical-align: middle;
+    color: #1a1a1a;
+  }
+  .fill-table select {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: #0f0e0b;
+    font-family: inherit;
+    font-size: .83rem;
+    cursor: pointer;
+    appearance: auto;
+  }
+  .fill-table select option { background: var(--surface); color: var(--text); }
+
+  /* ─── FEEDBACK ─── */
+  .drop-cell.correct-cell { background: var(--green-bg) !important; border-color: var(--correct-border) !important; }
+  .drop-cell.incorrect-cell { background: var(--red-bg) !important; border-color: var(--wrong-border) !important; }
+  .opt-item.correct { background: var(--green-bg) !important; border-color: var(--correct-border) !important; }
+  .opt-item.incorrect { background: var(--red-bg) !important; border-color: var(--wrong-border) !important; }
+  .fill-table select.correct-sel { background: var(--green-bg); }
+  .fill-table select.incorrect-sel { background: var(--red-bg); }
+
+  .explanation_unused {
+    display: none;
+    margin-top: 1.2rem;
+    padding: 1rem 1.1rem;
+    background: var(--surface2);
+    border-left: 3px solid var(--gold);
+    font-size: .83rem;
+    line-height: 1.7;
+    color: #1a1a1a;
+    border-radius: 0 4px 4px 0;
+  }
+  .explanation strong { color: var(--gold); font-weight: 500; }
+
+  /* ─── SUBMIT ─── */
+  .submit-row {
+    max-width: 880px;
+    margin: 2rem auto 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .btn-submit {
+    font-family: 'DM Mono', monospace;
+    font-size: .72rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: .75rem 2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .btn-submit:hover { background: #0f2550; }
+  .btn-reset {
+    font-family: 'DM Mono', monospace;
+    font-size: .72rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    background: transparent;
+    color: #0f0e0b;
+    border: 1px solid var(--border);
+    padding: .75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+  }
+  .btn-reset:hover { background: #ebe7d8; color: var(--text); }
+
+  .score-banner {
+    display: none;
+    max-width: 880px;
+    margin: 1.5rem auto 0;
+    padding: 1.2rem 1.6rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 4px;
+  }
+  .score-banner.show { display: block; }
+  .score-banner h3 { font-family: 'DM Serif Display', serif; font-size: 1.05rem; margin-bottom: .4rem; color: var(--text); }
+  .score-banner p { font-size: .87rem; line-height: 1.65; color: #1a1a1a; }
+
+  /* ─── CHANGES LOG ─── */
+  .tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: .62rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: #444444;
+    padding: .1rem .4rem;
+    border-radius: 2px;
+    margin-right: .3rem;
+  }
+
+  @media (max-width: 620px) {
+    .dd-container { grid-template-columns: 1fr; }
+    .data-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="badge">TBS</span>
+  <span class="series-tag">YoshimiLabo  ·  AUD-TBS001</span>
+  <h1>Audit Risk Assessment</h1>
+  <span class="pts">10 Points</span>
+</header>
+
+<!-- SCENARIO -->
+<div class="scenario-card">
+  <div class="scenario-label">Exhibit 1 — Client Background</div>
+  <h2>Crestwood Logistics Partners, LLC</h2>
+  <p>You are an audit manager at Yoshimi &amp; Associates, LLP, conducting the year-end audit of Crestwood Logistics Partners, LLC (Crestwood), a privately held regional freight and last-mile delivery company operating across nine states in the Southeast. This is the firm's third year auditing Crestwood.</p>
+  <p>During the planning phase, you obtained the following data through preliminary analytical procedures and inquiries with senior management:</p>
+
+  <div class="data-grid">
+    <div class="data-row"><span class="data-label">Revenue (current yr)</span><span class="data-value">$112.7M</span></div>
+    <div class="data-row"><span class="data-label">Revenue (prior yr)</span><span class="data-value">$79.4M</span></div>
+    <div class="data-row"><span class="data-label">Operating margin (current)</span><span class="data-value">6.1%</span></div>
+    <div class="data-row"><span class="data-label">Operating margin (prior)</span><span class="data-value">13.8%</span></div>
+    <div class="data-row"><span class="data-label">A/R days outstanding</span><span class="data-value">81 days</span></div>
+    <div class="data-row"><span class="data-value">44 days</span><span class="data-label">(industry avg)</span></div>
+    <div class="data-row"><span class="data-label">Fuel cost % of revenue</span><span class="data-value">29.4%</span></div>
+    <div class="data-row"><span class="data-value">17.2%</span><span class="data-label">(prior year)</span></div>
+  </div>
+
+  <p style="margin-top:1rem;">Additional facts: (1) The Controller left in October; financial statement close is now handled by a staff accountant with two years of experience. (2) Crestwood's revolving credit facility requires maintaining a debt-to-EBITDA ratio below 4.0×; the current estimated ratio is 3.8×. (3) The company launched a same-day drone delivery pilot programme in Q3, generating 24% of current-year revenue. (4) Revenue from drone deliveries is recorded upon dispatch rather than upon confirmed receipt, and reconciliation between the dispatch log and billing system is performed monthly rather than daily.</p>
+</div>
+
+<!-- TASKS -->
+<div class="tasks-wrapper">
+
+  <!-- TASK 1: DRAG-DROP -->
+  <div class="task" id="task1">
+    <div class="task-header">
+      <span class="task-num">TASK 1 OF 3</span>
+      <p class="task-q">For each risk factor listed in the table below, drag the most appropriate <strong>risk category</strong> from the pool on the left into the corresponding cell.</p>
+    </div>
+    <div class="task-body">
+      <div class="dd-container">
+        <div class="source-pool">
+          <h4>Risk Category Pool</h4>
+          <div id="pool">
+            <span class="chip" draggable="true" data-val="Inherent Risk – Financial Statement Level">IR – FS Level</span>
+            <span class="chip" draggable="true" data-val="Inherent Risk – Assertion Level">IR – Assertion Level</span>
+            <span class="chip" draggable="true" data-val="Control Risk">Control Risk</span>
+            <span class="chip" draggable="true" data-val="Fraud Risk">Fraud Risk</span>
+            <span class="chip" draggable="true" data-val="Going Concern Risk">Going Concern Risk</span>
+          </div>
+        </div>
+        <div class="drop-zone-wrap">
+          <h4>Classification</h4>
+          <table class="drop-table">
+            <thead><tr><th>Risk Factor</th><th>Category</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Controller departure; staff accountant now manages financial close</td>
+                <td class="drop-cell" data-correct="Control Risk" id="dc1"></td>
+              </tr>
+              <tr>
+                <td>Monthly (not daily) reconciliation between dispatch log and billing system</td>
+                <td class="drop-cell" data-correct="Control Risk" id="dc2"></td>
+              </tr>
+              <tr>
+                <td>Operating margin compressed from 13.8% to 6.1% without clear explanation</td>
+                <td class="drop-cell" data-correct="Inherent Risk – Assertion Level" id="dc3"></td>
+              </tr>
+              <tr>
+                <td>Debt-to-EBITDA ratio sits 0.2× below the covenant ceiling</td>
+                <td class="drop-cell" data-correct="Fraud Risk" id="dc4"></td>
+              </tr>
+              <tr>
+                <td>42% revenue surge driven by an untested drone delivery programme</td>
+                <td class="drop-cell" data-correct="Inherent Risk – FS Level" id="dc5"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASK 2: MULTIPLE SELECT -->
+  <div class="task" id="task2">
+    <div class="task-header">
+      <span class="task-num">TASK 2 OF 3</span>
+      <p class="task-q">Select <strong>all</strong> financial statement assertions most at risk for the <em>revenue</em> account given the conditions described. (Select all that apply.)</p>
+    </div>
+    <div class="task-body">
+      <ul class="options-list" id="task2-opts">
+        <li class="opt-item" data-val="cutoff" data-correct="true">
+          <input type="checkbox"> Cut-off — revenue is recognised in the correct accounting period
+        </li>
+        <li class="opt-item" data-val="occurrence" data-correct="true">
+          <input type="checkbox"> Occurrence — recorded revenues relate to transactions that actually took place
+        </li>
+        <li class="opt-item" data-val="completeness" data-correct="false">
+          <input type="checkbox"> Completeness — all revenues that should be recorded have been included
+        </li>
+        <li class="opt-item" data-val="classification" data-correct="false">
+          <input type="checkbox"> Classification — revenues are presented in the appropriate financial statement line
+        </li>
+        <li class="opt-item" data-val="accuracy" data-correct="true">
+          <input type="checkbox"> Accuracy — revenues are recorded at the correct monetary amounts
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- TASK 3: DROP-DOWN TABLE -->
+  <div class="task" id="task3">
+    <div class="task-header">
+      <span class="task-num">TASK 3 OF 3</span>
+      <p class="task-q">For each audit planning decision below, select the most appropriate auditor response given the identified risk conditions.</p>
+    </div>
+    <div class="task-body">
+      <table class="fill-table">
+        <thead>
+          <tr>
+            <th>Planning Decision</th>
+            <th>Risk Driver</th>
+            <th>Auditor Response</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Overall materiality threshold</td>
+            <td>Elevated inherent risk; tight debt covenant</td>
+            <td>
+              <select data-correct="Lower" id="s1">
+                <option value="">— Select —</option>
+                <option>Lower</option>
+                <option>Maintain at prior-year level</option>
+                <option>Raise</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Substantive testing approach for revenue</td>
+            <td>Dispatch-based recognition; monthly reconciliation gap</td>
+            <td>
+              <select data-correct="Expand sample sizes; perform cut-off procedures around year-end dispatch records" id="s2">
+                <option value="">— Select —</option>
+                <option>Rely on prior-year substantive results given third-year engagement</option>
+                <option>Expand sample sizes; perform cut-off procedures around year-end dispatch records</option>
+                <option>Reduce testing scope; increase reliance on internal controls</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Engagement of a specialist</td>
+            <td>Drone delivery programme — novel technology and regulatory environment</td>
+            <td>
+              <select data-correct="Engage a technology or valuation specialist to assess drone programme assets and revenue methodology" id="s3">
+                <option value="">— Select —</option>
+                <option>No specialist required; use management's documentation</option>
+                <option>Defer specialist assessment to next year's audit</option>
+                <option>Engage a technology or valuation specialist to assess drone programme assets and revenue methodology</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Accounts receivable audit procedures</td>
+            <td>A/R days = 81 vs. industry avg 44; collectability concern</td>
+            <td>
+              <select data-correct="Broaden confirmation coverage; scrutinise the adequacy of the allowance for doubtful accounts" id="s4">
+                <option value="">— Select —</option>
+                <option>Perform analytical procedures only; consistent with prior year</option>
+                <option>Broaden confirmation coverage; scrutinise the adequacy of the allowance for doubtful accounts</option>
+                <option>Limit testing to the top 10 balances by dollar value</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+
+
+<style>
+.copyright {
+  max-width: 880px;
+  margin: 1.5rem auto 0;
+  padding: .7rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: .65rem;
+  color: #444444;
+  letter-spacing: .08em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+.copyright .cr-name { color: var(--text); font-weight: 500; }
+  .series-tag { font-family: 'DM Mono', monospace; font-size: .6rem; color: var(--accent); letter-spacing: .12em; text-transform: uppercase; }
+</style>
+
+<div class="copyright">
+  <span class="cr-name">© 2026 YoshimiLabo</span>
+  <span>All companies and figures are fictional · For educational purposes only</span>
+</div>
+
+<script>
+// Auto fullscreen on load
+(function() {
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+  if (req) req.call(el).catch(() => {});
+})();
+
+let draggedChip = null;
+
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('dragstart', e => { draggedChip = chip; chip.classList.add('dragging'); });
+  chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
+});
+
+document.querySelectorAll('.drop-cell').forEach(cell => {
+  cell.addEventListener('dragover', e => { e.preventDefault(); cell.classList.add('over'); });
+  cell.addEventListener('dragleave', () => cell.classList.remove('over'));
+  cell.addEventListener('drop', e => {
+    e.preventDefault();
+    cell.classList.remove('over');
+    if (!draggedChip) return;
+    const existing = cell.querySelector('.chip');
+    if (existing) { existing.remove(); }
+    const clone = draggedChip.cloneNode(true);
+    clone.classList.add('placed');
+    clone.classList.remove('dragging');
+    clone.setAttribute('draggable', true);
+    clone.addEventListener('dragstart', ev => { draggedChip = clone; clone.classList.add('dragging'); });
+    clone.addEventListener('dragend', () => clone.classList.remove('dragging'));
+    cell.appendChild(clone);
+    draggedChip.classList.remove('dragging');
+    draggedChip = null;
+  });
+  cell.addEventListener('dragstart', e => {
+    const chip = e.target.closest('.chip');
+    if (chip && cell.contains(chip)) { draggedChip = chip; chip.classList.add('dragging'); }
+  });
+});
+
+document.querySelectorAll('#task2-opts .opt-item').forEach(item => {
+  item.addEventListener('click', e => {
+    if (e.target.tagName === 'INPUT') return;
+    const cb = item.querySelector('input');
+    cb.checked = !cb.checked;
+    item.classList.toggle('selected', cb.checked);
+  });
+  item.querySelector('input').addEventListener('change', function() {
+    item.classList.toggle('selected', this.checked);
+  });
+});
+</script>
+</body>
+</html>
