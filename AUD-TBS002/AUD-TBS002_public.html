@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AUD Task-Based Simulation — Meridian Plastics Corporation</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { overflow-x: hidden; width: 100%; }
+  body { font-family: Georgia, serif; background: #F7F8FA; color: #1A1A2E; min-height: 100vh; }
+  .header { background: #1B3A6B; color: #fff; padding: 24px 20px 20px; }
+  .header-eyebrow { font-family: Arial, sans-serif; font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: #9BB8D4; margin-bottom: 6px; }
+  .header-title { font-size: 26px; font-weight: bold; line-height: 1.2; }
+  .header-sub { font-family: Arial, sans-serif; font-size: 14px; color: #C8D8EA; margin-top: 6px; }
+  .badges { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  .badge { background: rgba(255,255,255,.1); border-radius: 6px; padding: 5px 12px; font-family: Arial, sans-serif; font-size: 12px; color: #fff; }
+  .badge span { color: #9BB8D4; }
+  .tabs { background: #fff; border-bottom: 2px solid #D1D9E6; padding: 0 24px; display: flex; overflow-x: auto; }
+  .tab { background: none; border: none; cursor: pointer; padding: 13px 18px 11px; font-size: 13px; font-family: Arial, sans-serif; font-weight: 400; color: #5A6478; border-bottom: 3px solid transparent; white-space: nowrap; transition: color .15s; }
+  .tab.active { font-weight: 700; color: #1B3A6B; border-bottom: 3px solid #C5973A; }
+  .content { max-width: 100%; margin: 0 auto; padding: 28px 16px 48px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .section-header { margin-bottom: 18px; }
+  .section-header h2 { font-size: 19px; font-weight: bold; color: #1B3A6B; display: inline; }
+  .section-sub { font-family: Arial, sans-serif; font-size: 12.5px; color: #5A6478; margin-top: 4px; margin-left: 26px; }
+  .card { background: #fff; border: 1px solid #D1D9E6; border-radius: 10px; overflow: hidden; }
+  .card-body { padding: 28px 32px; line-height: 1.85; font-size: 15px; }
+  .card-body p { margin-bottom: 16px; }
+  .info-box { margin-top: 16px; background: #EEF4FB; border: 1px solid #C3D8EE; border-radius: 8px; padding: 14px 20px; font-size: 13px; font-family: Arial, sans-serif; color: #1B3A6B; }
+  .ex1-section { padding: 20px 28px; border-bottom: 1px solid #D1D9E6; }
+  .ex1-section:last-child { border-bottom: none; }
+  .ex1-label { font-size: 11px; font-family: Arial, sans-serif; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #C5973A; margin-bottom: 7px; }
+  .ex1-text { font-size: 14.5px; line-height: 1.75; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; font-family: Arial, sans-serif; }
+  thead tr { background: #1B3A6B; color: #fff; }
+  thead th { padding: 11px 12px; text-align: left; font-weight: 600; white-space: normal; font-size: 12px; word-break: keep-all; }
+  tbody tr:nth-child(even) { background: #F3F7FC; }
+  tbody tr { border-bottom: 1px solid #D1D9E6; }
+  tbody td { padding: 10px 12px; vertical-align: top; line-height: 1.5; }
+  .ex2-id { font-weight: 700; color: #2E6DA4; }
+  .row-cutoff { background: #FFF7ED !important; }
+  .row-mof { background: #FFF0F0 !important; }
+  .table-legend { padding: 12px 16px; font-size: 12px; font-family: Arial, sans-serif; color: #5A6478; border-top: 1px solid #D1D9E6; display: flex; gap: 20px; flex-wrap: wrap; }
+
+  /* ── Tasks ── */
+  .task-card { background: #fff; border: 1px solid #D1D9E6; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .task-header { background: #1B3A6B; color: #fff; padding: 12px 20px; display: flex; align-items: center; gap: 12px; }
+  .task-num { background: #C5973A; color: #1B3A6B; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0; font-family: Arial, sans-serif; }
+  .task-title-text { font-family: Arial, sans-serif; font-weight: 700; font-size: 14px; }
+  .task-body { padding: 18px 20px; }
+  .task-prompt { font-size: 14px; line-height: 1.75; margin-bottom: 14px; }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .opt-btn { background: #fff; border: 1.5px solid #D1D9E6; border-radius: 8px; padding: 11px 15px; text-align: left; cursor: pointer; font-size: 13.5px; font-family: Arial, sans-serif; line-height: 1.5; color: #1A1A2E; transition: all .15s; width: 100%; }
+  .opt-btn:hover:not(:disabled) { border-color: #2E6DA4; background: #F3F7FC; }
+  .opt-btn.selected { background: #EEF4FB; border: 2px solid #2E6DA4; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-eyebrow">Yoshimi Labo　AUD-TBS002</div>
+  <div class="header-title">AUD Task-Based Simulation</div>
+  <div class="header-sub">Topic: Internal Control &amp; Evidence · Accounts Payable · Meridian Plastics Corporation</div>
+  <div class="badges">
+    <div class="badge"><span>Difficulty: </span>Advanced</div>
+    <div class="badge"><span>Assertions: </span>Completeness, Cutoff, Existence</div>
+    <div class="badge"><span>Standards: </span>AU-C 240, 265, 330, 530</div>
+    <div class="badge"><span>Rev: </span>1</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab(0)">Scenario</button>
+  <button class="tab" onclick="showTab(1)">Exhibit 1</button>
+  <button class="tab" onclick="showTab(2)">Exhibit 2</button>
+  <button class="tab" onclick="showTab(3)">Exhibit 3</button>
+  <button class="tab" onclick="showTab(4)">Tasks</button>
+</div>
+
+<div class="content">
+
+<!-- SCENARIO -->
+<div class="panel active" id="panel-0">
+  <div class="section-header"><span style="font-size:18px">📋</span> <h2>Scenario</h2><div class="section-sub">Read carefully before proceeding to exhibits and tasks</div></div>
+  <div class="card"><div class="card-body">
+    <p>Meridian Plastics Corporation ("Meridian") is a mid-sized manufacturer of industrial packaging components headquartered in Columbus, Ohio. The company generates approximately $180 million in annual revenue and maintains a December 31 fiscal year-end. You are an audit senior at Calloway &amp; Reed LLP ("C&amp;R"), currently conducting the financial statement audit for the year ended December 31, 20X3.</p>
+    <p>Meridian's production process relies heavily on raw materials procurement. The purchasing department initiates purchase orders (POs), which require dual approval for amounts exceeding $50,000. Receiving personnel log goods received into the enterprise resource planning (ERP) system, and accounts payable (AP) processes invoices independently. Management has represented that a three-way match control (PO, receiving report, and vendor invoice) operates automatically within the ERP system prior to payment authorization.</p>
+    <p>During planning, your team assessed the risk of material misstatement related to accounts payable as moderate-to-high, citing a history of cutoff errors and a recent ERP system upgrade completed in August 20X3. The engagement partner has directed you to test the operating effectiveness of the three-way match control and to gather sufficient appropriate evidence over the completeness and accuracy of year-end accounts payable.</p>
+    <p>Your procedures have generated three exhibits: an internal control memo prepared by Meridian's controller, an exception report produced by the ERP system, and a sample of vendor invoices tested for the period October–December 20X3.</p>
+  </div></div>
+  <div class="info-box"><strong>Instructions:</strong> Review the exhibits, then answer all 6 tasks.</div>
+</div>
+
+<!-- EXHIBIT 1 -->
+<div class="panel" id="panel-1">
+  <div class="section-header"><span style="font-size:18px">📄</span> <h2>Internal Control Memo — Accounts Payable Process</h2><div class="section-sub">Prepared by: Dana Fleischer, Controller | Date: November 14, 20X3</div></div>
+  <div class="card">
+    <div class="ex1-section"><div class="ex1-label">Overview</div><div class="ex1-text">The AP module of the ERP system (Vantage Pro v9.2, upgraded August 5, 20X3) is configured to perform a three-way match before releasing any payment batch. A payment will be blocked if any of the following conditions exist: (a) no approved PO on file, (b) quantity received is less than quantity invoiced by more than 2%, or (c) unit price variance between PO and invoice exceeds 3%.</div></div>
+    <div class="ex1-section"><div class="ex1-label">Approval Thresholds</div><div class="ex1-text">POs under $10,000: single approval (purchasing supervisor). POs $10,000–$50,000: dual approval (purchasing supervisor + finance manager). POs over $50,000: dual approval + CFO sign-off required before release.</div></div>
+    <div class="ex1-section"><div class="ex1-label">Post-Upgrade Changes</div><div class="ex1-text">Following the August upgrade, configuration settings for the price-variance tolerance were temporarily set to 10% for a 30-day stabilization period (August 5 – September 4, 20X3) to allow legacy vendor pricing tables to migrate. The tolerance reverted to 3% on September 5, 20X3. IT has confirmed in writing that no other control parameters were altered.</div></div>
+    <div class="ex1-section"><div class="ex1-label">Manual Override Procedures</div><div class="ex1-text">Any payment processed outside the automated match requires a Manual Override Form (MOF) signed by the Controller and CFO. MOFs are logged in a separate register maintained by Internal Audit. During 20X3, 14 MOFs were issued: 11 for emergency procurement situations and 3 for system error corrections.</div></div>
+    <div class="ex1-section"><div class="ex1-label">Segregation of Duties</div><div class="ex1-text">Personnel who initiate POs do not have access to post vendor invoices or approve payments. The AP clerk who posts invoices cannot approve POs or access the receiving module. Payroll and AP functions are handled by separate staff.</div></div>
+  </div>
+</div>
+
+<!-- EXHIBIT 2 -->
+<div class="panel" id="panel-2">
+  <div class="section-header"><span style="font-size:18px">📊</span> <h2>ERP System Exception Report — Three-Way Match Failures (Q4 20X3)</h2><div class="section-sub">Period: October 1 – December 31, 20X3 | Generated: January 6, 20X4</div></div>
+  <div class="card"><div class="table-wrap"><table>
+    <thead><tr><th>Exception #</th><th>Vendor</th><th>Invoice Date</th><th>Invoice Amt ($)</th><th>PO Amt ($)</th><th>Received Qty</th><th>Invoiced Qty</th><th>Exception Type</th><th>Resolution</th></tr></thead>
+    <tbody>
+      <tr><td class="ex2-id">EX-0041</td><td>Hartwell Resins Ltd.</td><td>Oct 8</td><td>62,400</td><td>62,400</td><td>1,040</td><td>1,040</td><td>No approved PO on file at time of payment</td><td>MOF issued; CFO approved 10/10</td></tr>
+      <tr><td class="ex2-id">EX-0042</td><td>Chemco Supply Inc.</td><td>Oct 22</td><td>18,750</td><td>18,750</td><td>490</td><td>510</td><td>Qty received &lt; qty invoiced (3.9%)</td><td>Dispute resolved; invoice adjusted to $17,985</td></tr>
+      <tr><td class="ex2-id">EX-0043</td><td>Hartwell Resins Ltd.</td><td>Nov 3</td><td>88,500</td><td>88,500</td><td>1,475</td><td>1,475</td><td>No approved PO on file at time of payment</td><td>MOF issued; CFO approved 11/5</td></tr>
+      <tr><td class="ex2-id">EX-0044</td><td>Trident Polymers Co.</td><td>Nov 17</td><td>41,200</td><td>40,000</td><td>820</td><td>820</td><td>Unit price variance 3.0% — within tolerance; logged as informational</td><td>No action required</td></tr>
+      <tr><td class="ex2-id">EX-0045</td><td>BioSeal Components</td><td>Dec 2</td><td>29,600</td><td>29,600</td><td>592</td><td>592</td><td>Duplicate invoice detected</td><td>Second invoice voided; no payment made</td></tr>
+      <tr><td class="ex2-id">EX-0046</td><td>Chemco Supply Inc.</td><td>Dec 19</td><td>53,100</td><td>53,100</td><td>885</td><td>885</td><td>CFO sign-off missing (amt &gt; $50,000)</td><td>Payment held; CFO approval obtained 12/21</td></tr>
+      <tr><td class="ex2-id">EX-0047</td><td>Hartwell Resins Ltd.</td><td>Dec 28</td><td>71,300</td><td>71,300</td><td>1,188</td><td>1,188</td><td>No approved PO on file at time of payment</td><td>MOF issued; Controller approved only — CFO absent</td></tr>
+    </tbody>
+  </table></div></div>
+</div>
+
+<!-- EXHIBIT 3 -->
+<div class="panel" id="panel-3">
+  <div class="section-header"><span style="font-size:18px">🔍</span> <h2>Auditor's Invoice Sample Testing — Q4 20X3</h2><div class="section-sub">Sample size: 40 invoices | Selection: Monetary-unit sampling | Tolerable misstatement: $250,000 | Risk of incorrect acceptance: 5%</div></div>
+  <div class="card"><div class="table-wrap"><table>
+    <thead><tr style="background:#2E6DA4"><th>Invoice #</th><th>Vendor</th><th>Invoice Date</th><th>Invoice Amt ($)</th><th>PO on File?</th><th>Receiving Report Matched?</th><th>Period Recorded</th><th>Auditor Notes</th></tr></thead>
+    <tbody>
+      <tr class="row-mof"><td class="ex2-id">INV-8814</td><td>Hartwell Resins Ltd.</td><td>Dec 28</td><td>71,300</td><td>No</td><td>Yes</td><td>Dec 20X3</td><td>EX-0047; MOF missing CFO signature</td></tr>
+      <tr><td class="ex2-id">INV-8801</td><td>Trident Polymers Co.</td><td>Dec 30</td><td>44,500</td><td>Yes</td><td>Yes</td><td>Dec 20X3</td><td>No exceptions noted</td></tr>
+      <tr><td class="ex2-id">INV-8756</td><td>Chemco Supply Inc.</td><td>Dec 19</td><td>53,100</td><td>Yes</td><td>Yes</td><td>Dec 20X3</td><td>EX-0046; payment delayed but properly recorded</td></tr>
+      <tr class="row-cutoff"><td class="ex2-id">INV-8699</td><td>Vantage Logistics LLC</td><td>Dec 31</td><td>38,200</td><td>Yes</td><td>No — receiving report dated Jan 4, 20X4</td><td>Dec 20X3</td><td>Potential cutoff issue — goods received in January</td></tr>
+      <tr class="row-cutoff"><td class="ex2-id">INV-8702</td><td>Summit Adhesives Inc.</td><td>Dec 31</td><td>27,500</td><td>Yes</td><td>No — receiving report dated Jan 2, 20X4</td><td>Dec 20X3</td><td>Potential cutoff issue — goods received in January</td></tr>
+      <tr><td class="ex2-id">INV-8643</td><td>BioSeal Components</td><td>Dec 2</td><td>29,600</td><td>Yes</td><td>Yes</td><td>Dec 20X3</td><td>Duplicate voided per EX-0045; only one charge recorded</td></tr>
+      <tr class="row-mof"><td class="ex2-id">INV-8590</td><td>Hartwell Resins Ltd.</td><td>Nov 3</td><td>88,500</td><td>No</td><td>Yes</td><td>Nov 20X3</td><td>EX-0043; MOF on file with proper dual approval</td></tr>
+      <tr><td class="ex2-id">INV-8544</td><td>Greenfield Packaging</td><td>Oct 15</td><td>19,400</td><td>Yes</td><td>Yes</td><td>Oct 20X3</td><td>No exceptions noted</td></tr>
+      <tr><td class="ex2-id">INV-8511</td><td>Chemco Supply Inc.</td><td>Oct 22</td><td>17,985</td><td>Yes</td><td>Yes</td><td>Oct 20X3</td><td>Adjusted per EX-0042; correct amount recorded</td></tr>
+      <tr class="row-mof"><td class="ex2-id">INV-8489</td><td>Hartwell Resins Ltd.</td><td>Oct 8</td><td>62,400</td><td>No</td><td>Yes</td><td>Oct 20X3</td><td>EX-0041; MOF on file with CFO approval</td></tr>
+    </tbody>
+  </table></div>
+  <div class="table-legend"><span>🟡 Orange rows: Cutoff exceptions</span><span>🔴 Pink rows: MOF exceptions</span></div>
+  </div>
+</div>
+
+<!-- TASKS -->
+<div class="panel" id="panel-4">
+  <div class="section-header"><span style="font-size:18px">✏️</span> <h2>Tasks</h2><div class="section-sub" id="task-sub">Select an answer for each of the 6 questions below</div></div>
+
+  <!-- Q1 -->
+  <div class="task-card">
+    <div class="task-header"><div class="task-num">1</div><div class="task-title-text">Control Deficiency Classification</div></div>
+    <div class="task-body">
+      <div class="task-prompt">Based on the information in Exhibits 1 and 2, evaluate Exception EX-0047 (INV-8814, Hartwell Resins Ltd., December 28). Determine the most appropriate classification of the internal control deficiency. Select the best answer.</div>
+      <div class="options" id="opts-1">
+        <button class="opt-btn" onclick="selectOpt(1,'A',this)">A. A control deficiency, because the MOF was eventually filed</button>
+        <button class="opt-btn" onclick="selectOpt(1,'B',this)">B. A significant deficiency, because the control deviation is isolated and the amount is immaterial to total AP</button>
+        <button class="opt-btn" onclick="selectOpt(1,'C',this)">C. A material weakness, because a payment exceeding $50,000 was authorized without CFO sign-off, bypassing a key compensating control, and Hartwell Resins represents a pattern of missing POs</button>
+        <button class="opt-btn" onclick="selectOpt(1,'D',this)">D. No reportable condition, because the CFO was absent and the Controller's approval was a reasonable business accommodation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="task-card">
+    <div class="task-header"><div class="task-num">2</div><div class="task-title-text">Cutoff Testing — Period-End Cutoff</div></div>
+    <div class="task-body">
+      <div class="task-prompt">Review Exhibit 3. Two invoices (INV-8699 and INV-8702) were recorded in December 20X3, but receiving reports indicate the goods were not received until January 20X4. Both purchase orders specify FOB destination terms. Which assertion is most directly affected, and what is the auditor's most appropriate response?</div>
+      <div class="options" id="opts-2">
+        <button class="opt-btn" onclick="selectOpt(2,'A',this)">A. Valuation — the auditor should recompute the invoice amounts for accuracy</button>
+        <button class="opt-btn" onclick="selectOpt(2,'B',this)">B. Cutoff error resulting in liabilities recorded in the wrong accounting period — the auditor should propose adjusting entries to remove these liabilities from 20X3 and record them in 20X4</button>
+        <button class="opt-btn" onclick="selectOpt(2,'C',this)">C. Completeness — the auditor should search for unrecorded liabilities as of December 31</button>
+        <button class="opt-btn" onclick="selectOpt(2,'D',this)">D. Rights and obligations — the auditor should confirm that Meridian holds title to the goods as of December 31</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="task-card">
+    <div class="task-header"><div class="task-num">3</div><div class="task-title-text">Impact of ERP System Upgrade on Audit Approach</div></div>
+    <div class="task-body">
+      <div class="task-prompt">Exhibit 1 discloses that the three-way match control's price-variance tolerance was temporarily changed from 3% to 10% from August 5 to September 4, 20X3. How should this most affect C&amp;R's audit strategy for the fiscal year ended December 31, 20X3?</div>
+      <div class="options" id="opts-3">
+        <button class="opt-btn" onclick="selectOpt(3,'A',this)">A. The auditor should bifurcate the testing period: rely on substantive procedures for August 5 – September 4 transactions and consider control reliance only for the remainder of the year after confirming the reversion</button>
+        <button class="opt-btn" onclick="selectOpt(3,'B',this)">B. The auditor must disclaim an opinion on internal controls because a system parameter was changed without board approval</button>
+        <button class="opt-btn" onclick="selectOpt(3,'C',this)">C. The auditor can rely on the control for the full year because the parameter reverted to 3% before year-end</button>
+        <button class="opt-btn" onclick="selectOpt(3,'D',this)">D. The auditor should reduce the sample size for AP testing because the ERP upgrade indicates management takes IT controls seriously</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="task-card">
+    <div class="task-header"><div class="task-num">4</div><div class="task-title-text">Vendor Pattern — Professional Skepticism</div></div>
+    <div class="task-body">
+      <div class="task-prompt">Across Exhibits 2 and 3, Hartwell Resins Ltd. appears in three Q4 exceptions (EX-0041, EX-0043, EX-0047), all categorized as "No approved PO on file at time of payment," with total Q4 payments of $222,200. Consistent with AU-C 240, which additional audit procedure is most appropriate?</div>
+      <div class="options" id="opts-4">
+        <button class="opt-btn" onclick="selectOpt(4,'A',this)">A. Issue an immediate management letter citing Hartwell Resins as a fraudulent vendor</button>
+        <button class="opt-btn" onclick="selectOpt(4,'B',this)">B. Confirm accounts payable balances directly with Hartwell Resins and review the complete population of Hartwell Resins transactions for the full year 20X3 to assess whether the pattern extends beyond Q4</button>
+        <button class="opt-btn" onclick="selectOpt(4,'C',this)">C. Reduce further testing of Hartwell Resins because the MOF process successfully compensated for the missing POs</button>
+        <button class="opt-btn" onclick="selectOpt(4,'D',this)">D. Request that management terminate the vendor relationship with Hartwell Resins before issuing the audit report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="task-card">
+    <div class="task-header"><div class="task-num">5</div><div class="task-title-text">Sampling — Projecting Misstatements</div></div>
+    <div class="task-body">
+      <div class="task-prompt">C&amp;R used monetary-unit sampling (MUS) with a tolerable misstatement of $250,000 and a 5% risk of incorrect acceptance. The sample identified $65,700 in cutoff errors (INV-8699 and INV-8702). Total recorded AP is $14,800,000. Assuming the projected misstatement exceeds tolerable misstatement, which conclusion is most appropriate?</div>
+      <div class="options" id="opts-5">
+        <button class="opt-btn" onclick="selectOpt(5,'A',this)">A. Accept the AP balance as materially correct because $65,700 is only 0.44% of total AP</button>
+        <button class="opt-btn" onclick="selectOpt(5,'B',this)">B. Request that management investigate and propose adjusting entries; if management does not adjust, consider the impact on the audit opinion</button>
+        <button class="opt-btn" onclick="selectOpt(5,'C',this)">C. Automatically qualify the audit report because misstatements were found in the sample</button>
+        <button class="opt-btn" onclick="selectOpt(5,'D',this)">D. Increase the sample size to 100 and reperform the entire MUS procedure before taking any action</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="task-card">
+    <div class="task-header"><div class="task-num">6</div><div class="task-title-text">Communication Requirements</div></div>
+    <div class="task-body">
+      <div class="task-prompt">C&amp;R has identified a material weakness (EX-0047 / MOF missing CFO signature) and potential fraud risk indicators related to Hartwell Resins. To whom must these be communicated, and in what form, under AU-C 265 and AU-C 240?</div>
+      <div class="options" id="opts-6">
+        <button class="opt-btn" onclick="selectOpt(6,'A',this)">A. Both matters must be communicated only to management in writing; no communication to those charged with governance is required unless management requests it</button>
+        <button class="opt-btn" onclick="selectOpt(6,'B',this)">B. The material weakness must be communicated in writing to both management and those charged with governance; fraud risk indicators must be communicated to those charged with governance and appropriate management, and to authorities if required by law</button>
+        <button class="opt-btn" onclick="selectOpt(6,'C',this)">C. Both matters may be communicated orally at the auditor's discretion, as long as documented in workpapers</button>
+        <button class="opt-btn" onclick="selectOpt(6,'D',this)">D. The material weakness requires only a verbal communication at the exit conference; written communication is required only for significant deficiencies</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- end content -->
+
+<div style="text-align:center; padding: 20px 16px 32px; font-family: Arial, sans-serif; font-size: 12px; color: #5A6478; border-top: 1px solid #D1D9E6; margin-top: 32px;">
+  © 2026 YoshimiLabo · AUD-TBS002 · All companies and figures are fictional and for educational purposes only.
+</div>
+
+<script>
+var selected = {};
+
+function selectOpt(taskId, letter, btn) {
+  selected[taskId] = letter;
+  var btns = document.querySelectorAll('#opts-' + taskId + ' .opt-btn');
+  btns.forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+}
+
+function showTab(i) {
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('panel-' + i).classList.add('active');
+  document.querySelectorAll('.tab')[i].classList.add('active');
+}
+</script>
+</body>
+</html>
